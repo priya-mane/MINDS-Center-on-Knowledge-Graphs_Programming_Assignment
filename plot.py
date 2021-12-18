@@ -2,23 +2,53 @@ import plotly.express as px
 import pandas as pd
 import argparse
 import datetime
+from tqdm import tqdm
 
 class plots:
+    '''
+    A class for processing results and plotting line graph using plotly.
+    ...
+    Attributes
+    ----------
+    input_file : str
+        file containing daily frequencies.
+    output_file : str
+        name of static image file (jpeg) for saving the plot.
+    title : str
+        title of the plot.
+    dates : list
+        list of dates from the input file.
+    counts : list
+        count associated with each date from input file.
+
+    Methods
+    -------
+    get_data():
+        Reads data from input file and saves data in list form.
+    plot():
+        Plots and saves line graph for data using plotly.
+
+    '''
     def __init__(self, input_file, output_file, title):
         self.input_file = input_file
         self.output_file = output_file
+        self.title = title
         self.dates = []
         self.counts = []
-        self.title = title
 
     def get_data(self):
+        '''
+        Reads date,counts from input file and saves data in list form.
+        Input  : Input file path
+        Output : Two list of dates and counts associated with each date.
+        '''
         file = open(self.input_file, 'r')
         lines = file.readlines()
 
         dates = []
         counts = []
 
-        for line in lines:
+        for line in tqdm(lines):
             date, count = line.split(",")
             count.strip()
             date.strip()
@@ -30,6 +60,11 @@ class plots:
         self.counts = counts
 
     def plot(self):
+        '''
+        Plots and saves line graph for data using plotly.
+        Input  : Two lists are used - Dates and count/values.
+        Output : Plot is displayed in web browser and a static image is saved with output filename.
+        '''
         df = pd.DataFrame(dict(
             x = self.dates,
             y = self.counts))

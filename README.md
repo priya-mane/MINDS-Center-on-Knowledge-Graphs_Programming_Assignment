@@ -1,15 +1,5 @@
 # MINDS + Center on Knowledge Graphs  Programming Assignment
 
-
-### Summary of Results
-
-![Number of messages per day](daily_message_count.jpeg)
-
-
-![Average Sentiment per day](sentiment.jpeg)
-
-***
-
 ### Documentation for Code
 
 [main](main.py) 
@@ -76,14 +66,82 @@ python main.py -i telegram_messages.json -o output
 Mention input filename, output filename and the title for the graph
 
 ```
-python plot.py -i daily_message_count.txt -o daily_message_count -t "daily message count"
+python plot.py -i <input file path>.txt -o <output filename for image> -t "<title for plot>"
 ```
 
-- For knowing more about the script.
+Eg.
+
+```
+python plot.py -i daily_message_count.txt -o daily_message_count_plot -t "daily message count"
+```
+
+```
+python plot.py -i avg_daily_sentiment.txt -o avg_daily_sentiment_plot -t "average daily sentiment"
+```
+
+- For knowing more about the scripts.
 
 ```
 python main.py --help
 ```
+
+```
+python plot.py --help
+```
+
+- For details on class and their methods, import the class in python and use the following -
+
+```
+print(<class>.__doc__)
+```
+
+Eg.
+
+```
+print(preprocessor.__doc__) 
+```
+
+output - 
+
+```
+A class containing preprocessing techniques used for the messages.
+    ...
+    Attributes
+    ----------
+    messages : list
+        all the messages in format (date,message text).
+
+    Methods
+    -------
+    filter_non_english_messages():
+        Discards non-English messages.
+    specific_word_filter():
+        Identifies messages with special words.
+```
+
+
+- For any uodates made, update the requirements.txt using.
+
+```
+pip freeze > requirements.txt
+```
+***
+
+
+### Summary of Results
+
+[Telegram messages](telegram_messages.json)
+- Contains messages from telegram group Crypto.com from May 1, 2021 to May 15, 2021 in json format.
+
+***
+
+![Number of messages per day](daily_message_count_plot.jpeg)
+
+***
+
+![Average Sentiment per day](avg_daily_sentiment_plot.jpeg)
+
+
 ***
 
 

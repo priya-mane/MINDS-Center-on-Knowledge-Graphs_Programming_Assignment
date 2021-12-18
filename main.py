@@ -7,16 +7,53 @@ from datetime import datetime
 from collections import Counter
 
 class messages_processor:
+    '''
+    A class to represent message processing pipeline
+    ...
+    Attributes
+    ----------
+    input_file : str
+        file containing messages from telegram group in json format.
+    output_file : str
+        name of the file for saving the results after processing messages.
+    specific_words : set
+        specific words used to filter messages.
+    messages : list 
+        all the messages in format (date,message text).
+    english_messages : list
+        list of English messages out of all messages in format (date,message text).
+    specific_messages : list
+        English messages with specific words in format (date,message text).
+    sentiments : list
+        Sentiment classified for English messages in format (date, sentiment, compound polarity )
+
+    Methods
+    -------
+    read_input():
+        Reads input from json file containing telegram messages.
+    process():
+        Filters English messages and identifies messages with specific words, performs sentiment
+        analysis for the same.
+    get_avg_sentiment_and_day_count():
+        Get average sentiment per day and count of messages per day.
+    save_result():
+        Save the output of total processing.
+    '''
     def __init__(self,input_file, output_file, specific_words):
+        self.input_file = input_file
+        self.output_file = output_file
+        self.specific_words = specific_words
         self.messages = []
         self.english_messages = []
         self.specific_messages = []
         self.sentiments = []
-        self.specific_words = specific_words
-        self.input_file = input_file
-        self.output_file = output_file
-
+        
     def read_input(self):
+        '''
+        Reads input from json file containing telegram messages.
+        Input  : input file name.
+        Output : list of tuples [(date, message text)].
+        '''
         data = json.load(open(self.input_file,"r", encoding='utf8'))
         print("Reading messages......")
 
@@ -24,9 +61,13 @@ class messages_processor:
             dt = datetime.strptime(m['date'], "%Y-%m-%dT%H:%M:%S")
             msg_txt = m['text']
 
+            
             if (type(msg_txt)==str):
+                # message is a direct string
                 text = msg_txt
             else:
+                # message is a list of items like string and dict(url information), 
+                # discard url information.
                 text = ""
                 for t in msg_txt:
                     if (type(t)==str):
@@ -35,6 +76,12 @@ class messages_processor:
             self.messages.append((dt.strftime("%Y-%m-%d"), text))
             
     def process(self):
+        '''
+        Filters English messages and identifies messages with specific words, performs sentiment
+        analysis for the same.
+        Input  : Messages texts and specific words.
+        Output : Processed messages.
+        '''
         prep = preprocessor(self.messages)
         self.english_messages = prep.filter_non_english_messages()
         self.specific_messages = prep.specific_word_filter(self.english_messages, self.specific_words)
@@ -44,9 +91,16 @@ class messages_processor:
         self.save_result()
 
     def get_avg_sentiment_and_day_count(self):
+        '''
+        Get average sentiment per day and count of messages per day.
+        Input  : Sentiment classified sentences with date information.
+        Output : Two files generated with information for average sentiment per day 
+                 and count of messages per day.
+        '''
         daily_sentiment_tracker = Counter()
         day_counter = Counter()
 
+        # Daily sentiment is the addition of compound polarity for each message of that day
         for d,_,pol in self.sentiments:
             daily_sentiment_tracker[d] += pol
             day_counter[d] += 1
@@ -65,6 +119,11 @@ class messages_processor:
         f.close()
 
     def save_result(self):
+        '''
+        Save the output of total processing.
+        Input  : Processed messages.
+        Output : Saves objects with date, messages text and sentiment identified into output json file.
+        '''
         result = {}
         print("Saving output......")
         for i in tqdm(range(len(self.specific_messages))):
